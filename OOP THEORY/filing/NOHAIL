@@ -1,0 +1,103 @@
+#include<fstream>
+#include<iostream>
+#include<string>
+using namespace std;
+
+class Bank{
+	int accno;
+	char name[20];
+	char address[20];
+	int transactions;
+	
+	public:
+		void createaccount(){
+			cout<<"Enter acc no:";
+			cin>> accno;
+			cout<<"Enter name:";
+			cin>> name;
+			cout<<"Enter address: ";
+			cin>>address;
+			transactions=0;
+			
+			ofstream of("account.txt",ios::binary|ios::app);
+			
+			of.write(reinterpret_cast<char *>(this),sizeof(Bank));
+			of.close();
+		}
+		
+		void display(){
+			cout<<endl<<accno<<endl<<name<<endl<<address<<endl<<transactions<<endl;
+		}
+		
+		void getallaccountdata(){
+			ifstream of("account.txt");
+			
+			while(of.read(reinterpret_cast<char *>(this),sizeof(Bank))){
+				this->display();
+			}
+		}
+		
+		void searchdatabyname(){
+			char a[20];
+			cout<< "\nEnter name to search: ";
+			cin >> a;
+			ifstream of("account.txt");
+			
+			while(of.read(reinterpret_cast<char *>(this),sizeof(Bank))){
+				if((strcmpi(this->name,a))==0){
+					this->display();
+				}
+			}			
+		}			
+
+		
+		
+		void modify(){
+			int a;
+			cout<<"Enter acc no: ";
+			cin >> a;
+
+			fstream of("account.txt",ios::binary|ios::in|ios::out);
+			
+			while(of.read(reinterpret_cast<char *>(this),sizeof(Bank))){
+				if(this->accno==a){
+					this->display();
+					cin>>this->name;
+			int pos=(-1)*static_cast<int>(sizeof(Bank));
+			of.seekp(pos,ios::cur);					
+					of.write(reinterpret_cast<char *>(this),sizeof(Bank));
+					this->display();
+				}
+			}
+			}
+			
+			void modify2(){
+			int a;
+			cout<<"Enter acc no: ";
+			cin >> a;
+			
+			ifstream old("account.txt",ios::binary);
+			ofstream newe("temp.txt",ios::binary|ios::app);
+			
+			while(old.read(reinterpret_cast<char *>(this),sizeof(Bank))){
+				if(this->accno==a){
+					cout <<"\n\nEnter new name: ";
+					cin >> this->name;
+				}
+				newe.write(reinterpret_cast<char *>(this),sizeof(Bank));
+			}
+			old.close();
+			newe.close();
+			remove("account.txt");
+			rename("temp.txt","account.txt");				
+			}
+};
+
+int main(){
+	Bank a;
+//	a.createaccount();
+a.getallaccountdata();
+//a.searchdatabyname();
+//a.modify2();
+
+}
